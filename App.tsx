@@ -18,6 +18,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const App = () => {
   const [getImageSelect, setImageSelect] = useState(false);
+  const [getImageCheck, setImageCheck] = useState('');
   const [getImageUrl, setImageUrl] = useState('');
 
   const Cancel = () => {
@@ -26,18 +27,31 @@ const App = () => {
   };
 
   const SelectImage = () => {
-    ImagePicker.openPicker({
+    ImagePicker.openPicker({}).then(image => {
+      console.log(image);
+      console.log('height ===>>> ', image.height > 1080);
+      console.log('width ===>>> ', image.width > 1920);
+      if (image.height > 1080 && image.width > 1920) {
+        ImageCropping(image);
+      } else {
+        Alert.alert('Select different image greater then 1080 x 1920');
+      }
+    });
+  };
+
+  const ImageCropping = (ImageUrl: any) => {
+    ImagePicker.openCropper({
+      path: ImageUrl.path,
       cropping: true,
       includeExif: true,
       hideBottomControls: true,
       waitAnimationEnd: false,
       cropperChooseText: 'ok',
       cropperCancelText: 'Cancel',
-    }).then(image => {
-      console.log(image.path);
-      if (image.path != '') {
+    }).then(finalImage => {
+      if (finalImage.path != '') {
         setImageSelect(true);
-        setImageUrl(image.path);
+        setImageUrl(finalImage.path);
       }
     });
   };
